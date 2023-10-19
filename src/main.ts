@@ -21,6 +21,7 @@ import { FormsModule } from '@angular/forms';
             class="tc-form__input--dollar"
             placeholder="0"
             min="0"
+            max="1000000"
             step="0.01"
             oninput="validity.valid || (value='')"
             [value]="billAmount()"
@@ -43,6 +44,7 @@ import { FormsModule } from '@angular/forms';
               class="tc-form__input"
               placeholder="Custom"
               min="0"
+              max="1000"
               oninput="validity.valid || (value='')"
               [value]="customTip()"
               (input)="setCustomTip(Number(customTipField.value))"
@@ -58,6 +60,7 @@ import { FormsModule } from '@angular/forms';
             [class.error]="numberOfPeople() === 0"
             placeholder="0"
             min="0"
+            max="1000"
             oninput="validity.valid || (value='')"
             [value]="numberOfPeople()"
             (input)="numberOfPeople.set(Number(numberOfPeopleField.value))"
@@ -67,12 +70,22 @@ import { FormsModule } from '@angular/forms';
         <div class="tc-results">
           <div class="tc-results__result">
             <p>Tip Amount <span>/ person</span></p>
-            <h1>$<span>{{ tipAmountPerPerson() | number: '1.2-2' }}</span></h1>
+            <h1
+              [ngClass]="{
+                'text-2': this.tipAmountPerPerson().toString().length > 4,
+                'text-15': this.tipAmountPerPerson().toString().length > 6
+              }"
+            >$<span>{{ tipAmountPerPerson() | number: '1.2-2' }}</span></h1>
           </div>
 
           <div class="tc-results__result">
             <p>Total <span>/ person</span></p>
-            <h1>$<span>{{ totalPerPerson() | number: '1.2-2' }}</span></h1>
+            <h1
+              [ngClass]="{
+              'text-2': this.totalPerPerson().toString().length > 4,
+              'text-15': this.totalPerPerson().toString().length > 6
+              }"
+            >$<span>{{ totalPerPerson() | number: '1.2-2' }}</span></h1>
           </div>
 
           <button class="btn active" (click)="reset()">Reset</button>
