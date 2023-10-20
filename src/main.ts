@@ -71,21 +71,13 @@ import { FormsModule } from '@angular/forms';
           <div class="tc-results__result">
             <p>Tip Amount <span>/ person</span></p>
             <h1
-              [ngClass]="{
-                'text-2': this.tipAmountPerPerson().toString().length > 4,
-                'text-15': this.tipAmountPerPerson().toString().length > 6
-              }"
+              [ngClass]="textSizeTip()"
             >$<span>{{ tipAmountPerPerson() | number: '1.2-2' }}</span></h1>
           </div>
 
           <div class="tc-results__result">
             <p>Total <span>/ person</span></p>
-            <h1
-              [ngClass]="{
-              'text-2': this.totalPerPerson().toString().length > 4,
-              'text-15': this.totalPerPerson().toString().length > 6
-              }"
-            >$<span>{{ totalPerPerson() | number: '1.2-2' }}</span></h1>
+            <h1 [class]="textSizeTotal()">$<span>{{ totalPerPerson() | number: '1.2-2' }}</span></h1>
           </div>
 
           <button class="btn active" (click)="reset()">Reset</button>
@@ -99,24 +91,34 @@ export class App {
 
   protected readonly Number = Number;
 
-  billAmount = signal(0);
-  customTip= signal(null);
-  numberOfPeople = signal(1);
+  billAmount = signal<number>(0);
+  customTip = signal<number>(null);
+  numberOfPeople = signal<number>(1);
 
-  tips = signal([5, 10, 15, 25, 50]);
+  tips = signal<number[]>([5, 10, 15, 25, 50]);
   selectedTip = signal<number>(null);
+
+  tipAmountPerPerson = computed(() => this.billAmount() * (this.tip / 100) / this.numberOfPeople());
+  totalPerPerson = computed(() => this.billAmount() * (1 + (this.tip / 100)) / this.numberOfPeople());
+
+  textSizeTip = computed(() => this.setTextSize(this.tipAmountPerPerson()));
+  textSizeTotal = computed(() => this.setTextSize(this.totalPerPerson()));
 
   get tip(): number {
     return this.selectedTip() ? this.selectedTip() : this.customTip();
   }
 
-  tipAmountPerPerson = computed(() => {
-    return this.billAmount() * (this.tip / 100) / this.numberOfPeople();
-  });
+  setTextSize(length: number): string {
+    length = Math.floor(length).toString().length;
 
-  totalPerPerson = computed(() => {
-    return this.billAmount() * (1 + (this.tip / 100)) / this.numberOfPeople();
-  });
+    if (length > 6) {
+      return 'text-15';
+    } else if (length > 4) {
+      return 'text-2';
+    }
+
+    return '';
+  }
 
   selectTip(tip: number): void {
     this.selectedTip.set(tip);
@@ -135,6 +137,7 @@ export class App {
     this.selectedTip.set(null);
   }
 }
+
 bootstrapApplication(App).then(() => {
   console.log('Application is running!');
 });
